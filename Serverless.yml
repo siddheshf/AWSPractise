@@ -1,0 +1,53 @@
+
+service: newproject
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: python3.8
+  lambdaHashingVersion: 20201221
+  environment:
+    DYNAMODB_TABLE : serverlessSiddhesh_addStudent_practise
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action :
+        - dynamodb:Scan
+        - dynamodb:UpdateItem
+        - dynamodb:PutItem
+      #Resource: "arn:aws:dynamodb:us-east-1:808289581277:table/serverlessSiddhesh_addStudent_practise"
+      Resource: "arn:aws:dynamodb:*:*:table/serverlessSiddhesh_addStudent_practise"
+
+functions:
+  hello:
+    handler: handler.hello
+    package:
+      individually: true
+    events:
+      - http:
+          path: hello
+          method: get
+  RxInput:
+    handler: handler.RxInput
+    role: arn:aws:iam::808289581277:role/Lambda_DynamoDB_Full_Access
+    package:
+      individually: true
+    events:
+      - http:
+          path: RxInput
+          method: post
+
+resources:
+  Resources:
+    StudentTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: serverlessSiddhesh_addStudent_practise
+        AttributeDefinitions:
+          - AttributeName: student_Name
+            AttributeType: S
+        KeySchema:
+          - AttributeName: student_Name
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
